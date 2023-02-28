@@ -1,0 +1,18 @@
+#!/bin/sh
+branch="$(git rev-parse --abbrev-ref HEAD)"
+
+echo "Executing Bandit"
+bandit -r .
+
+python3 lint.py -p ./qradar-app/
+pylint_response=$?
+
+if [ "$pylint_response" = "1" ]; then
+  echo "Pylint Check Failed. Please fix the Pylint issues"
+  exit 1
+fi
+
+if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
+  echo "You can't commit directly to ${branch} branch"
+  exit 1
+fi
